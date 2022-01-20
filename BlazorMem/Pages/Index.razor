@@ -1,0 +1,80 @@
+﻿@page "/"
+
+<PageTitle>BlazorMem</PageTitle>
+
+<h1>Hello, BlazorMem!</h1>
+
+<div>
+    <button @onclick="MeasureMem">Measure mem</button>
+</div>
+<div>
+    <button @onclick="AllocateDotNetMem">Allocate DotNet memory</button>
+    <button @onclick="FreeDotNetMem">Free DotNet memory</button>
+</div>
+<div>
+    <button @onclick="AllocateJsMem">Allocate JS memory</button>
+    <button @onclick="FreeJsMem">Free JS memory</button>
+</div>
+
+<div>
+    &nbsp;
+</div>
+
+<div>
+    Memory used: <input value="@_memoryUsed" readonly="true" /> MB
+</div>
+
+@code {
+    private IJSInProcessObjectReference _js;
+
+    private MemTest _memTest;
+
+    private long _memoryUsed = 0;
+
+    [Inject]
+    public IJSRuntime Js { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _js = await Js.InvokeAsync<IJSInProcessObjectReference>("import", "./js/mem.js");
+
+            MeasureMem();
+            StateHasChanged();
+        }
+    }
+
+    private void MeasureMem()
+    {
+        _memoryUsed = _js.Invoke<long>("getMemUsage") / (1024*1024);
+    }
+
+    private void AllocateDotNetMem()
+    {
+        _memTest = new MemTest();
+        _memTest.AllocateMemory();
+
+        MeasureMem();
+    }
+
+    private void FreeDotNetMem()
+    {
+        _memTest.FreeMemory();
+
+        MeasureMem();
+    }
+
+    private void AllocateJsMem()
+    {
+        _js.InvokeVoid("allocateArray");
+        MeasureMem();
+    }
+
+    private void FreeJsMem()
+    {
+        _js.InvokeVoid("freeArray");
+        MeasureMem();
+    }
+
+}
