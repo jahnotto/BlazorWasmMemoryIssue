@@ -24,12 +24,17 @@
     Memory used: <input value="@_memoryUsed" readonly="true" /> MB
 </div>
 
+<div>
+    <textarea cols="80" rows="20">@_exceptionMessage</textarea>
+</div>
+
 @code {
     private IJSInProcessObjectReference _js;
 
-    private MemTest _memTest;
+    private readonly MemTest _memTest = new MemTest();
 
     private long _memoryUsed = 0;
+    private string _exceptionMessage = String.Empty;
 
     [Inject]
     public IJSRuntime Js { get; set; }
@@ -52,8 +57,14 @@
 
     private void AllocateDotNetMem()
     {
-        _memTest = new MemTest();
-        _memTest.AllocateMemory();
+        try
+        {
+            _memTest.AllocateMemory();
+        }
+        catch (Exception e)
+        {
+            _exceptionMessage = e.ToString();
+        }
 
         MeasureMem();
     }
@@ -67,7 +78,15 @@
 
     private void AllocateJsMem()
     {
-        _js.InvokeVoid("allocateArray");
+        try
+        {
+            _js.InvokeVoid("allocateArray");
+        }
+        catch (Exception e)
+        {
+            _exceptionMessage = e.ToString();
+        }
+
         MeasureMem();
     }
 
