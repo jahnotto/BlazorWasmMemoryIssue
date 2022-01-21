@@ -47,12 +47,7 @@ public partial class MainWindow : Window
 
     private void FreeClick(object sender, RoutedEventArgs e)
     {
-        _memTest.FreeMemory();
-
-        if (GCCheckBox.IsChecked.Value)
-        {
-            GC.Collect();
-        }
+        _memTest.FreeMemory(GCCheckBox.IsChecked.Value);
 
         MeasureMem();
     }

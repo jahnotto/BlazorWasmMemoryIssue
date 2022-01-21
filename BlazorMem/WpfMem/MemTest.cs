@@ -1,4 +1,6 @@
-﻿namespace BlazorMem;
+﻿using System;
+
+namespace BlazorMem;
 
 public class MemTest
 {
@@ -9,9 +11,13 @@ public class MemTest
         _memBuffer = new byte[512 * 1024 * 1024];
     }
 
-    public void FreeMemory()
+    public void FreeMemory(bool runGc)
     {
         _memBuffer = null;
-        //GC.Collect(); // This is not recommended, and it has no effect in this case
+
+        if (runGc)
+        {
+            GC.Collect();
+        }
     }
 }

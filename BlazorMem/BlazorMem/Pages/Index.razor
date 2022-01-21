@@ -10,6 +10,7 @@
 <div>
     <button @onclick="AllocateDotNetMem">Allocate DotNet memory</button>
     <button @onclick="FreeDotNetMem">Free DotNet memory</button>
+    <input type="checkbox" @bind="@_gcAfterFree"> GC after free
 </div>
 <div>
     <button @onclick="AllocateJsMem">Allocate JS memory</button>
@@ -35,6 +36,8 @@
 
     private long _memoryUsed = 0;
     private string _exceptionMessage = String.Empty;
+
+    private bool _gcAfterFree;
 
     [Inject]
     public IJSRuntime Js { get; set; }
@@ -71,7 +74,7 @@
 
     private void FreeDotNetMem()
     {
-        _memTest.FreeMemory();
+        _memTest.FreeMemory(_gcAfterFree);
 
         MeasureMem();
     }
