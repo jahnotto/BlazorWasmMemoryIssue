@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -47,6 +48,11 @@ public partial class MainWindow : Window
     private void FreeClick(object sender, RoutedEventArgs e)
     {
         _memTest.FreeMemory();
+
+        if (GCCheckBox.IsChecked.Value)
+        {
+            GC.Collect();
+        }
 
         MeasureMem();
     }
